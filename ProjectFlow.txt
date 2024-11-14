@@ -1,0 +1,81 @@
+
+Here's a README checklist that outlines the remaining tasks for your food delivery application. Since you’ve already set up several components (like database connection, models, and authentication), the list will focus on other essential steps.
+
+Food Delivery Application Development Checklist
+1. Authentication & Authorization
+    User Authentication (NextAuth.js setup, bcrypt password hashing)
+    Restaurant Authentication (NextAuth.js setup, bcrypt password hashing)
+    Authorization Logic for Protected Routes
+    Implement role-based access control for user and restaurant roles (e.g., restricting access to the restaurant dashboard).
+2. Database Models
+    User Model
+        Schema: username, email, password, firstName, lastName, role
+    Restaurant Model
+        Schema: username, email, password, restaurantName, phoneNumber, address, city, country, role
+    Menu Item Model 
+        Schema: name, price, restaurantId (relation to Restaurant), description, category, image, available
+    Order Model
+        Schema: userId, restaurantId, items (array of MenuItem), totalPrice, status, createdAt
+    Delivery Person Model (optional)
+        Schema: username, email, password, phoneNumber, vehicleType
+3. API Routes
+    User Registration API
+        Endpoint: /api/users/signup
+    Logic: Register users, hash passwords, store in MongoDB.
+        Restaurant Registration API
+    Endpoint: /api/restaurants/signup
+        Logic: Register restaurants, hash passwords, store in MongoDB.
+    User Login API
+        Implement using NextAuth.js (already done).
+    Restaurant Login API
+        Implement using NextAuth.js (already done).
+    Menu Item CRUD API
+        Endpoints: /api/menu-items (GET, POST, PUT, DELETE)
+        Logic: Create, read, update, and delete menu items for restaurants.
+    Order Management API
+        Endpoints: /api/orders (GET, POST)
+        Logic: Create orders for users, update order status, fetch user orders.
+4. Frontend
+    User Signup Form
+        Create signup form for users, link to the User Signup API.
+    Restaurant Signup Form
+        Create signup form for restaurants, link to the Restaurant Signup API.
+    User/Restaurant Login Form
+        Use NextAuth.js signIn() method for logging in users and restaurants.
+    Restaurant Dashboard
+        Create a protected page for restaurant owners to manage their menu, view orders, and manage restaurant details.
+    Menu Page
+        Display menu items for each restaurant to users.
+    Order Page
+        Allow users to create orders, show order details, and track order status.
+5. Role-Based Access Control (RBAC)
+    Protect User Pages
+        Only allow users to access certain pages (e.g., their orders, profile).
+    Protect Restaurant Pages
+        Restrict restaurant pages (e.g., dashboard, order management) to only restaurant accounts.
+    Admin Dashboard (Optional)
+        Set up an admin dashboard for managing users, restaurants, and orders (optional).
+6. Testing
+    Unit Tests
+        Write tests for database models, API routes, and authentication using Jest or Mocha.
+    Integration Tests
+        Test interaction between components (e.g., a full signup/login process, placing an order) using Cypress or Playwright.
+    End-to-End Testing
+        Use Cypress to simulate user flows like registering, logging in, creating orders, etc.
+7. Deployment
+    Configure Environment Variables
+        Ensure .env file has variables for MongoDB connection, NextAuth.js secret, and any other third-party services.
+    Deploy Backend & Frontend
+        Use Vercel for Next.js deployment.
+        Host MongoDB on MongoDB Atlas or another cloud provider.
+    Set Up CI/CD
+        Set up continuous integration/continuous deployment pipeline (e.g., with GitHub Actions).
+8. Optional Features
+    Payment Integration
+        Add payment processing (e.g., Stripe or PayPal) to allow users to pay for orders.
+    Delivery Management
+        Implement functionality for delivery personnel to view and update the status of their deliveries.
+    Real-Time Notifications
+        Use Socket.IO or another WebSocket solution for real-time updates on order status.
+    Geolocation & Map Integration
+        Allow users to track their orders with real-time location updates from delivery personnel.
