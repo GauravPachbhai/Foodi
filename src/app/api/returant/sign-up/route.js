@@ -7,7 +7,7 @@ export async function POST(req, res) {
 
     try {
         await dbConnect();
-        const { username, email, password, restaurantName, phoneNumber, address, city, country, role, } = await req.json();
+        const { username, email, password, restaurantName, phoneNumber, address, city, country, role} = await req.json();
 
         //cheack Username Already Exist or taken
         const existingVerifiedResturantUsername = await Restaurant.findOne({

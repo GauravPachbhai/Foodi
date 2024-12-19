@@ -12,65 +12,76 @@ export const authOptions = {
       async authorize(credentials) {
         await dbConnect();
 
-        // Determine if login is for a user or a restaurant
+        // Check for User or Restaurant
         const user = await User.findOne({
-            $or:[
-                {email: credentials.identifier },
-                {username: credentials.username}
-            ]
-            
+          $or: [{ email: credentials.identifier }, { username: credentials.identifier }],
         });
-        const restaurant = await Restaurant.findOne({ email: credentials.email });
+
+        const restaurant = await Restaurant.findOne({
+          $or: [{ email: credentials.identifier }, { username: credentials.identifier }]
+        });
 
         const account = user || restaurant;
-        // console.log(credentials)
+        // console.log(account)
+
         if (!account) {
           throw new Error('No account found');
         }
-        if (!account.isVerified) {
-            throw new Error('Please verify your account before logging in');
-          }
+
+        if (account.isVerified === false || account.isVerified === undefined) {
+          throw new Error('Please verify your account before logging in');
+        }
 
         const isValidPassword = await bcrypt.compare(credentials.password, account.password);
+        console.log(isValidPassword)
 
         if (!isValidPassword) {
           throw new Error('Invalid credentials');
         }
 
         return {
-          id: account._id,
+          id: account._id.toString(),
           email: account.email,
+          username: account.username,
           role: account.role,
-          name: user ? `${user.firstName} ${user.lastName}` : restaurant.restaurantName,
+          isVerified: account.isVerified,
+          name: user
+            ? `${user.firstName} ${user.lastName}`
+            : restaurant.restaurantName,
         };
-      }
-    })
+      },
+    }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token._id = user._id?.toString(); // Convert ObjectId to string
-        token.isVerified = user.isVerified;
-        token.username = user.username;
-        token.role = user.role; // Add role to JWT token
+    async jwt({ token, account }) {
+
+      if (account) {
+        token._id = account.id;
+        token.email = account.email;
+        token.username = account.username;
+        token.role = account.role;
+        token.isVerified = account.isVerified;
       }
       return token;
     },
     async session({ session, token }) {
       if (token) {
-        session.user._id = token._id;
-        session.user.isVerified = token.isVerified;
-        session.user.username = token.username;
-        session.user.role = token.role; // Add role to session
+        session.user = {
+          _id: token._id,
+          email: token.email,
+          username: token.username,
+          role: token.role,
+          isVerified: token.isVerified,
+        };
       }
       return session;
-    }
+    },
   },
   pages: {
     signIn: '/sign-in',
   },
   session: {
-    jwt: true,
+    strategy: 'jwt',
   },
   secret: process.env.NEXTAUTH_SECRET,
 };

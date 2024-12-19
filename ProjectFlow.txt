@@ -20,18 +20,18 @@ Food Delivery Application Development Checklist
         Schema: username, email, password, phoneNumber, vehicleType
 3. API Routes
     User Registration API
-        Endpoint: /api/users/signup
+        Endpoint: /api/users/signup----------done
     Logic: Register users, hash passwords, store in MongoDB.
-        Restaurant Registration API
+        Restaurant Registration API-------------done
     Endpoint: /api/restaurants/signup
-        Logic: Register restaurants, hash passwords, store in MongoDB.
+        Logic: Register restaurants, hash passwords, store in MongoDB.--------done
     User Login API
-        Implement using NextAuth.js (already done).
+        Implement using NextAuth.js (already done).--------done
     Restaurant Login API
-        Implement using NextAuth.js (already done).
+        Implement using NextAuth.js (already done).----------done
     Menu Item CRUD API
         Endpoints: /api/menu-items (GET, POST, PUT, DELETE)
-        Logic: Create, read, update, and delete menu items for restaurants.
+        Logic: Create, read, update, and delete menu items for restaurants.-------done
     Order Management API
         Endpoints: /api/orders (GET, POST)
         Logic: Create orders for users, update order status, fetch user orders.

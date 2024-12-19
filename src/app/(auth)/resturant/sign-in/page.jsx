@@ -14,15 +14,15 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { SingInSchema } from '@/Schemas/SignInSchema';
 import { useToast } from '@/components/ui/use-toast';
+import { RestaurantSignInSchema } from '@/Schemas/ResturantSignInSchema';
 
 
 export default function SignInForm() {
   const router = useRouter();
 
   const form = useForm({
-    resolver: zodResolver(SingInSchema),
+    resolver: zodResolver(RestaurantSignInSchema),
     defaultValues: {
       identifier: '',
       password: '',
@@ -69,7 +69,7 @@ export default function SignInForm() {
             Welcome Back
           </h1>
           <img src="https://i.ibb.co/ZhJtt9q/logo2.jpg" className='h-28 m-1 justify-self-center' alt="Foddi img" />
-          <p className="mb-4 mt-1">Sign in to continue your Order</p>
+          <p className="mb-4 mt-1">Sign in to keep the orders flowing</p>
         </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">

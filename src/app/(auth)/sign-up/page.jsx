@@ -2,7 +2,6 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { signIn } from 'next-auth/react';
 import {
   Form,
   FormField,
@@ -16,10 +15,19 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { SingInSchema } from '@/Schemas/SignInSchema';
 import { useToast } from '@/components/ui/use-toast';
+import { useEffect, useState } from 'react';
+import { useDebounceCallback } from 'usehooks-ts';
+import axios from 'axios';
+import { Loader2 } from 'lucide-react';
 
 export default function SignInForm() {
   const router = useRouter();
-
+  const [username, setUsername] = useState('');
+  const [usernameMessage, setUsernameMessage] = useState('');
+  const [isCheckingUsername, setIsCheckingUsername] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const debounced = useDebounceCallback(setUsername, 300)
+  
   const form = useForm({
     resolver: zodResolver(SingInSchema),
     defaultValues: {
@@ -32,23 +40,63 @@ export default function SignInForm() {
     },
   });
 
-  const { toast } = useToast();
-  const onSubmit = async (data) => {
-    const result = await signIn('credentials', {
-      redirect: false,
-      identifier: data.username || data.email,
-      password: data.password,
-    });
 
-    if (result?.error) {
+  const { toast } = useToast();
+
+  useEffect(()=>{
+    const checkUsernameUnique = async ()=> {
+      
+      if(debounced){
+        setIsCheckingUsername(true);
+        setUsernameMessage(''); // Reset message
+        try {
+          const response = await axios.get(`api/check-username-unique?username=${username}`);
+          setUsernameMessage(response.data.message);
+        } catch (error) {
+          console.log(error);
+          const axiosError = error ;
+          setUsernameMessage(
+            axiosError.response?.data.message ?? 'Error checking username'
+          );
+        } finally {
+          setIsCheckingUsername(false);
+        }
+
+      }
+    };
+    checkUsernameUnique()
+  },[username]);
+
+  const onSubmit = async (data) => {
+    setIsSubmitting(true);
+    try {
+      const response = await axios.post('api/user/sign-up', data);
+
       toast({
-        title: 'Login Failed',
-        description: result.error === 'CredentialsSignin' ? 'Incorrect username or password' : result.error,
+        title: 'Success',
+        description: response.data.message,
+      });
+
+      router.replace(`/verify/${username}`);
+
+      setIsSubmitting(false);
+
+    } catch (error) {
+      console.error('Error during sign-up:', error);
+
+      const axiosError = error;
+
+      // Default error message
+      let errorMessage = axiosError.response?.data.message;
+      ('There was a problem with your sign-up. Please try again.');
+
+      toast({
+        title: 'Sign Up Failed',
+        description: errorMessage,
         variant: 'destructive',
       });
-    }
-    if (result?.url) {
-      router.replace('/dashboard');
+
+      setIsSubmitting(false);
     }
   };
 
@@ -63,7 +111,7 @@ export default function SignInForm() {
       <div className="w-full max-w-md p-9 space-y-8 bg-white rounded-lg shadow-md opacity-95">
         <div className="text-center items-center grid justify-self-center">
           <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-6">
-            Sing Up to 
+            Sing Up to
           </h1>
           <img
             src="https://i.ibb.co/ZhJtt9q/logo2.jpg"
@@ -76,28 +124,49 @@ export default function SignInForm() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             {/* Username and Email row */}
             <div className="">
+            <FormField
+              name="username"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Username</FormLabel>
+                  <Input
+                    {...field}
+                    onChange={(e) => {
+                      field.onChange(e);
+                      debounced(e.target.value);
+
+                    }}
+                  />
+                  {isCheckingUsername && <Loader2 className="animate-spin" />}
+                  {!isCheckingUsername &&  usernameMessage &&(
+                    
+                    <p
+                      className={`text-sm ${
+                        usernameMessage === 'Username is unique'
+                          ? 'text-green-500'
+                          : 'text-red-500'
+                      }`}
+                    >
+                      {usernameMessage}
+                    </p>
+                  )}
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
               <FormField
-                name="username"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Username</FormLabel>
-                    <Input {...field} />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                name="email"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <Input {...field} />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              name="email"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <Input {...field} name="email" />
+                  <p className='text-muted text-gray-400 text-sm'>We will send you a verification code</p>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             </div>
             {/* First Name and Last Name row */}
             <div className="grid grid-cols-2 gap-4">
@@ -150,15 +219,15 @@ export default function SignInForm() {
               />
             </div>
             <Button className="w-full" type="submit">
-              Sign In
+              Sign Up
             </Button>
           </form>
         </Form>
         <div className="text-center mt-4">
           <p>
             Not a member yet?{' '}
-            <Link href="/sign-up" className="text-blue-600 hover:text-blue-800">
-              Sign up
+            <Link href="/sign-in" className="text-blue-600 hover:text-blue-800">
+              Sign in
             </Link>
           </p>
         </div>
