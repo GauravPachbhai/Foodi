@@ -1,5 +1,6 @@
 import dbConnect from "@/lib/dbConnect";
 import OrderModel from "@/models/OrderModel";
+import { getToken } from "next-auth/jwt";
 
 //Post order
 export async function POST(req) {
@@ -64,37 +65,38 @@ export async function POST(req) {
 
 //GET all the orders for user or resturants
 export async function GET(req) {
-    const token = await getToken({
-        req,
-        secret: process.env.NEXTAUTH_SECRET,
-    });
-    // console.log('Decoded Token:', token.sub);
-    if (!token) {
-        return Response.json(
-            {
-                success: false,
-                message: 'Unauthorized: Invalid token',
-            },
-            { status: 401, headers: { 'Content-Type': 'application/json' } }
-        );
 
-    }
-
-    const { searchParams } = new URL(req.url);
-    const userId = searchParams.get("userId");
-    const restaurantId = searchParams.get("restaurantId");
-
-    if (!userId || !restaurantId) {
-        return Response.json(
-            {
-                success: false,
-                message: "Provide userId or restaurantId"
-            },
-            { status: 400 }
-        )
-    }
 
     try {
+        const token = await getToken({
+            req,
+            secret: process.env.NEXTAUTH_SECRET,
+        });
+        // console.log('Decoded Token:', token.sub);
+        if (!token) {
+            return Response.json(
+                {
+                    success: false,
+                    message: 'Unauthorized: Invalid token',
+                },
+                { status: 401, headers: { 'Content-Type': 'application/json' } }
+            );
+
+        }
+
+        const { searchParams } = new URL(req.url);
+        const userId = searchParams.get("userId");
+        const restaurantId = searchParams.get("restaurantId");
+
+        if (!userId || !restaurantId) {
+            return Response.json(
+                {
+                    success: false,
+                    message: "Provide userId or restaurantId"
+                },
+                { status: 400 }
+            )
+        }
         await dbConnect();
 
         const orders = await OrderModel.find({
@@ -111,10 +113,6 @@ export async function GET(req) {
             },
             { status: 200 }
         )
-
-
-
-
 
     } catch (error) {
         console.log("Error fetching orders: ", error);

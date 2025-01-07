@@ -1,10 +1,24 @@
+"use client";
+
+import { useRouter } from 'next/navigation';
 import foodCatg from './Arraydata/FoodCatgData';
 
 const Component = ({ title, ImgSrc, Alt }) => {
+  const router = useRouter();
+
+  // Redirect to the dynamic food category page
+  const handleClick = () => {
+  
+    router.push(`/categories/${Alt}`);
+  };
+
   return (
-    <div className="rounded-xl  border-1 border-gray-200 overflow-hidden  bg-gray-50">
+    <div
+      onClick={handleClick}
+      className="rounded-xl border-1 border-gray-200 overflow-hidden bg-gray-50 cursor-pointer hover:shadow-lg"
+    >
       <div
-        className="flex flex-col justify-end bg-cover bg-center bg-no-repeat overflow-hidden h-40 w-40  relative"
+        className="flex flex-col justify-end bg-cover bg-center bg-no-repeat overflow-hidden h-40 w-40 relative"
         style={{
           backgroundImage: `url(${ImgSrc})`
         }}
@@ -24,7 +38,6 @@ const Component = ({ title, ImgSrc, Alt }) => {
         <h3 className="text-sm float-left font-semibold">{title}</h3>
       </div>
     </div>
-
   );
 };
 
@@ -35,7 +48,12 @@ const FoodCatg = ({ showAll }) => {
   return (
     <div className="grid gap-6 mt-8 w-fit" style={{ gridTemplateColumns: 'repeat(6, 1fr)' }}>
       {itemsToShow.map((item, index) => (
-        <Component key={index} title={item.title} ImgSrc={item.ImgSrc} Alt={item.Alt} />
+        <Component
+          key={index}
+          title={item.title}
+          ImgSrc={item.ImgSrc}
+          Alt={item.Alt}
+        />
       ))}
     </div>
   );

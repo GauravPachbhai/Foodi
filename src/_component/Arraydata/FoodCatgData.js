@@ -21,12 +21,12 @@ const foodCatg = [
     },
     {
         title: "Salads",
-        ImgSrc: 'https://www.foodiecrush.com/wp-content/uploads/2020/07/Summer-Salad-foodiecrush.com-026.jpg',
+        ImgSrc: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHJrIdb0LX0219_vTO7ld9xAULzb3qdddOCW2bPv8p7LtMh4Vu-hcnXaXgsOMnu56Kfxk&usqp=CAU',
         Alt: 'Salads'
     },
     {
         title: "Sushi",
-        ImgSrc: 'https://www.thespruceeats.com/thmb/nUp7QUUg88NznLo0EZxkmPYXPxg=/3500x2333/filters:no_upscale():max_bytes(150000):strip_icc()/basic-sushi-rolls-2031451-hero-01-5c6d35d746e0fb0001f0f9b8.jpg',
+        ImgSrc: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQs67mZLQULHwSrFuGEkpfuJGBHjOzIpLiG-w&s',
         Alt: 'Sushi'
     },
     {
